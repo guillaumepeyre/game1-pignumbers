@@ -1,14 +1,14 @@
-# Learning Games
-## Pig: Guess a number
+# Game 1: Guess a number (oink)
 
 @ guillaumepeyre
-
-#################
+## How to install
+Install notes   <br>
+requirements.txt
 
 ## To-do list
 ### - Multiplayer
 ### - Custom difficulty
-### - Hint mode
-### - Better design
-### - New option menu
-### - This is branch 1
+### - New option settings
+#### - Difficulty saving (inc. custom) 
+#### - Hint mode
+### - Better design (and fix colors)
