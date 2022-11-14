@@ -1,14 +1,10 @@
 # Game 1: Guess a number (oink)
 
+Currently being tested/improved
+
 @ guillaumepeyre
 ## How to install
 Install notes   <br>
 requirements.txt
+> pip install -r requirements.txt
 
-## To-do list
-### - Multiplayer
-### - Custom difficulty
-### - New option settings
-#### - Difficulty saving (inc. custom) 
-#### - Hint mode
-### - Better design (and fix colors)
