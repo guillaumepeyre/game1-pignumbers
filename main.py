@@ -31,7 +31,7 @@ def print_intro1():
     print(f"""
 {Fore.LIGHTMAGENTA_EX + Style.BRIGHT}Oink Oink, HELLO!!!
 Welcome to Learning Python: Pig Games!{Style.RESET_ALL}
-{Fore.LIGHTMAGENTA_EX}I'm PIGg! And this is the terminal game: "GUESS A NUMBER"{Style.RESET_ALL}
+{Fore.LIGHTMAGENTA_EX}I'm PIG! And this is the terminal game: "GUESS A NUMBER"{Style.RESET_ALL}
 """)
 
 
