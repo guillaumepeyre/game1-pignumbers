@@ -1,19 +1,22 @@
 # !/usr/bin/env python
 
+# Learning Python: Pig Games
+# Game #1: Number Guesser (oink!)
+# github.com/guillaumepeyre
+# guillaumepeyre@proton.me
+
 import random
 import csv
 import os.path
 import pandas as pd
-
-from colorama import init
 from colorama import Fore
 from colorama import Style
 
-init()
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
-########################################################################################################################
-########################################################################################################################
-########################################################################################################################
+""" Formatting functions """
 
 
 def print_line(lines):
@@ -24,25 +27,108 @@ def print_space(spaces):
     for i in range(spaces): print("")
 
 
-def print_intro():
-    print("""
-Welcome to Pig's famous "GUESS MY NUMBER" game
+def print_intro1():
+    print(f"""
+{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}Oink Oink, HELLO!!!
+Welcome to Learning Python: Pig Games!{Style.RESET_ALL}
+{Fore.LIGHTMAGENTA_EX}I'm PIGg! And this is the terminal game: "GUESS A NUMBER"{Style.RESET_ALL}
+""")
 
-----------------------------------------------
-The goal is to guess the right number in as little attempts as possible!
-You can use a pre-made difficulty build or just make up your own!""")
+
+
+
+def print_intro2():
+    print(f"""{Fore.LIGHTMAGENTA_EX}Oink... I'm thinking about a number. Can you guess it???
+There are different options to make our game more interesting:
+\t* 5 different difficulties
+\t* Hint mode (for the pig cheaters!)
+\t* Locally-saved scoreboard
+\t* Oink oink stuff{Style.RESET_ALL}""")
+
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+
+""" Menu functions """
+
+
+def main_menu():
+    print_space(1); print_line(1); print_space(1)
+    print(f"""{Style.BRIGHT}Let's get oinking... Choose any option by typing the number below:{Style.RESET_ALL}
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}1{Style.RESET_ALL}] Play Game
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}2{Style.RESET_ALL}] Open Settings
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}3{Style.RESET_ALL}] View Scoreboard
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}4{Style.RESET_ALL}] Exit
+    """)
+
+    try:
+        option = int(input(f"{Fore.YELLOW}[PIG ORDER]{Style.RESET_ALL}" + " Enter an option now! (1-4): "))
+
+        if option == 1: start_game()
+        elif option == 2: open_settings()
+        elif option == 3: read_scores()
+        elif option == 4:
+            print_space(1)
+            print(f"{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}Pig bye! See ya soon.{Style.RESET_ALL}")
+            exit()
+        else: raise ValueError
+
+    except ValueError:
+        print_space(1)
+        print(f"{Fore.RED}[OINK!] Please enter a valid number{Style.RESET_ALL}")
+        main_menu()
+
+
+def open_settings():
+    print_space(1); print_line(1); print_space(1)
+
+    # Initialize an instance of gamesettings to run checks and prepare game settings
+    new_game = GameSettings(0, False)
+    new_game.preferences_file_check()
+
+    # Retrieve current hint status to display in menu
+    print_hint_status = new_game.retrieve_preferences('hint')
+    if print_hint_status == 1: print_hint_status = 'ON'
+    elif print_hint_status == 0: print_hint_status = 'OFF'
+
+    print(f"""You are in [{Style.BRIGHT}PIG SETTINGS{Style.RESET_ALL}]. Choose an option below by entering a number:
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}1{Style.RESET_ALL}] Set difficulty
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}2{Style.RESET_ALL}] Toggle Hint Mode [Current Status: {Fore.LIGHTMAGENTA_EX + Style.BRIGHT}{print_hint_status}{Style.RESET_ALL}]
+    [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}3{Style.RESET_ALL}] Go back to main menu
+    """)
+
+    try:
+        option = int(input(f"{Fore.YELLOW}[PIG ORDER]{Style.RESET_ALL}" + " Enter an option now! (1-3): "))
+
+        if option == 1:
+            new_game.edit_difficulty()
+            main_menu()
+        elif option == 2:
+            new_game.toggle_hint()
+            open_settings()
+        elif option == 3: main_menu()
+        else: raise ValueError
+
+    except ValueError:
+        print_space(1)
+        print(f"{Fore.RED}[OINK!] Please enter a valid number{Style.RESET_ALL}")
+
+        main_menu()
 
 
 def score_menu_options():
-    print("""
+    print(f"""
 What would you like to do?
-\t [1] Play a game
-\t [2] Reset scores (this CANNOT be undone!)
-\t [3] Go back to main menu
+\t [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}1{Style.RESET_ALL}] Play a game
+\t [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}2{Style.RESET_ALL}] Reset scores (this CANNOT be undone!)
+\t [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}3{Style.RESET_ALL}] Go back to main menu
 """)
 
+
     try:
-        option = int(input(f"{Fore.YELLOW}[INPUT NEEDED]{Style.RESET_ALL}" + " Enter an option below: "))
+        option = int(input(f"{Fore.YELLOW}[PIG ORDER]{Style.RESET_ALL}" + " Enter an option now!: "))
         if option == 1: start_game()
 
         if option == 2:
@@ -52,25 +138,26 @@ What would you like to do?
                 score_writer.writeheader()
 
             print_space(1)
-            print("You score have been reset.")
+            print(f"{Fore.LIGHTGREEN_EX}Your score dashboard have been reset.{Style.RESET_ALL}")
             main_menu()
 
         elif option == 3: main_menu()
         else: raise ValueError
 
-    except ValueError: print(f"{Fore.RED}[WARNING]{Style.RESET_ALL}" + "Please enter a valid option")
+    except ValueError: print(f"{Fore.RED}[OINK!]{Style.RESET_ALL}" + "Please enter a valid option")
 
 
-def read_game_id():
-    try:
-        with open("scores.csv", newline='') as score_file_object:
-            # Check if file is empty and set-up a variable
-            file_rows = len(score_file_object.readlines())
-            if file_rows == 1:return 1
-            else: return file_rows
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 
-    # If not file, then this is game #1
-    except FileNotFoundError: return 1
+
+""" File management functions """
+
+
+def file_exists(file):
+    if os.path.exists(file): return True
+    else: return False
 
 
 def find_index(option):
@@ -89,20 +176,16 @@ def find_index(option):
     else: return -1
 
 
-def set_basic_preference():
-    with open('preferences.csv', 'w+', newline='') as preference_csv:
-        fieldnames = ['name', 'value']
-        preference_writer = csv.DictWriter(preference_csv, fieldnames=fieldnames)
-        preference_writer.writeheader()
-        preference_writer.writerow({'name': 'difficulty', 'value': 1})
-        preference_writer.writerow({'name': 'hint', 'value': 0})
+def read_game_id():
+    try:
+        with open("scores.csv", newline='') as score_file_object:
+            # Check if file is empty and set-up a variable
+            file_rows = len(score_file_object.readlines())
+            if file_rows == 1:return 1
+            else: return file_rows
 
-
-def write_preferences(index, value):
-    # Update index in preferences.csv
-    df = pd.read_csv('preferences.csv')
-    df.at[index, 'value'] = value
-    df.to_csv('preferences.csv', index=False)
+    # If not file, then this is game #1
+    except FileNotFoundError: return 1
 
 
 def read_scores():
@@ -121,8 +204,8 @@ def read_scores():
             # Reset reader object
             score_file_reader = csv.DictReader(score_file_object)
             print_space(1)
-            print("""[SCORES DASHBOARD] Please see below for a list of all the games you won since the last reset:""")
-            for rows in score_file_reader: print("\tGame no. {id}: Won in {attempts} attempt(s)".format(id=rows['id'], attempts=rows['attempts']))
+            print(f"""you are in [{Style.BRIGHT}SCORE DASHBOARD{Style.RESET_ALL}]. Here's the games you won:""")
+            for rows in score_file_reader: print(f"{Fore.LIGHTMAGENTA_EX}-->{Style.RESET_ALL} Game no. {rows['id']}: Won in {rows['attempts']} attempt(s)")
 
             if is_file_empty is True: raise FileNotFoundError
 
@@ -131,8 +214,32 @@ def read_scores():
 
     except FileNotFoundError:
         print_space(1);
-        print(f"{Fore.YELLOW}It doesn't look like you've played any games yet!{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW + Style.BRIGHT}It doesn't look like you've played any games yet!{Style.RESET_ALL}")
         main_menu()
+
+
+def set_basic_preference():
+    with open('preferences.csv', 'w+', newline='') as preference_csv:
+        fieldnames = ['name', 'value']
+        preference_writer = csv.DictWriter(preference_csv, fieldnames=fieldnames)
+        preference_writer.writeheader()
+        preference_writer.writerow({'name': 'difficulty', 'value': 1})
+        preference_writer.writerow({'name': 'hint', 'value': 0})
+
+
+def write_preferences(index, value):
+    # Update index in preferences.csv
+    df = pd.read_csv('preferences.csv')
+    df.at[index, 'value'] = value
+    df.to_csv('preferences.csv', index=False)
+
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+
+""" Main function to launch or relaunch a game """
 
 
 def start_game():
@@ -151,89 +258,20 @@ def start_game():
     new_game.play_game()
 
 
-def main_menu():
-    print_space(1); print_line(1); print_space(1)
-    print("""Please start by choosing one of those options. Type a number from 1-4:
-    [1] Play Game
-    [2] Open Settings
-    [3] View Scoreboard
-    [4] Exit
-    """)
-
-    try:
-        option = int(input(f"{Fore.YELLOW}[INPUT NEEDED]{Style.RESET_ALL}" + " Enter an option below (1-4): "))
-
-        if option == 1: start_game()
-        elif option == 2: open_settings()
-        elif option == 3: read_scores()
-        elif option == 4: exit()
-        else: raise ValueError
-
-    except ValueError:
-        print_space(1)
-        print(f"{Fore.RED}[WARNING] Please enter a valid number{Style.RESET_ALL}")
-        main_menu()
-
-
-def open_settings():
-    print_space(1); print_line(1)
-
-    # Initialize an instance of gamesettings to run checks and prepare game settings
-    new_game = GameSettings(0, False)
-    new_game.preferences_file_check()
-
-    # Retrieve current hint status to display in menu
-    print_hint_status = new_game.retrieve_preferences('hint')
-    if print_hint_status == 1: print_hint_status = 'ON'
-    elif print_hint_status == 0: print_hint_status = 'OFF'
-
-    print(f"""You are in [SETTINGS]. Please choose an option below by entering a number:
-    [1] Set difficulty
-    [2] Toggle Hint Mode [Current Status: {Fore.YELLOW}{print_hint_status}{Style.RESET_ALL}]
-    [3] Go back to main menu
-    """)
-
-    try:
-        option = int(input(f"{Fore.YELLOW}[INPUT NEEDED]{Style.RESET_ALL}" + " Enter an option below (1-3): "))
-
-        if option == 1:
-            new_game.edit_difficulty()
-            main_menu()
-        elif option == 2:
-            new_game.toggle_hint()
-            open_settings()
-        elif option == 3: main_menu()
-        else: raise ValueError
-
-    except ValueError:
-        print_space(1)
-        print(f"{Fore.RED}[WARNING] Please enter a valid number{Style.RESET_ALL}")
-
-        main_menu()
-
-
-def calculate_difficulty(dictionary, key): return dictionary[key]["maxAttempts"] / dictionary[key]["maxInt"] * 100
-
-
-def file_exists(file):
-    if os.path.exists(file): return True
-    else: return False
-
-
-def test_color():
-    print(f"This is {Fore.GREEN}color{Style.RESET_ALL}!")
-
 ########################################################################################################################
 ########################################################################################################################
+########################################################################################################################
+
+""" Classes & Method """
 
 
 class GameSettings():
     difficulty_modes = {
-        1: {"name": "Easy", "maxInt": 10, "maxAttempts": 7},
-        2: {"name": "Medium", "maxInt": 20, "maxAttempts":10},
-        3: {"name": "Hard", "maxInt": 40, "maxAttempts": 12},
-        4: {"name": "Lucky", "maxInt": 80, "maxAttempts": 16},
-        5: {"name": "Oink!", "maxInt": 160, "maxAttempts": 24}
+        1: {"name": "Baby Pig", "maxInt": 10, "maxAttempts": 7},
+        2: {"name": "Angry Pig", "maxInt": 30, "maxAttempts":10},
+        3: {"name": "Mean Pig", "maxInt": 60, "maxAttempts": 12},
+        4: {"name": "Crazy Pig", "maxInt": 100, "maxAttempts": 15},
+        5: {"name": "Lord Piggy", "maxInt": 500, "maxAttempts": 10}
     }
 
     hint_modes = [0, 1]
@@ -339,18 +377,18 @@ class GameSettings():
     def set_difficulty(self):
         len_difficulty_modes = len(self.difficulty_modes)
 
-        print("Please start by choosing your difficulty settings. Type a number below:")
-
+        print_space(1)
+        print(f"{Style.BRIGHT}Meet some of my pig pals... Type a number below:{Style.RESET_ALL}")
         for i in self.difficulty_modes:
             iter_name = self.difficulty_modes[i]['name']
             iter_range = self.difficulty_modes[i]['maxInt']
             iter_attempts = self.difficulty_modes[i]['maxAttempts']
-            print("\t[{number}] {difficulty_mode} \t\tGuess range: 1-{range}\t\tMax attempts: {max_attempts}".format(number=i,difficulty_mode=iter_name,range=iter_range, max_attempts=iter_attempts))
+            print(f"\t[{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}{i}{Style.RESET_ALL}] {iter_name} \t\tGuess range: 1-{iter_range}\t\tMax attempts: {iter_attempts}")
 
         print_space(1)
 
         try:
-            difficulty_input = int(input(f"{Fore.YELLOW}[INPUT NEEDED]{Style.RESET_ALL}" + " Enter your difficulty settings (1-{max}):\n>>> ".format(max=len_difficulty_modes)))
+            difficulty_input = int(input(f"{Fore.YELLOW}[PIG ORDER]{Style.RESET_ALL}" + " Enter an option now! (1-{max}):\n>>> ".format(max=len_difficulty_modes)))
 
             if difficulty_input in self.difficulty_modes: self.difficulty_chosen = difficulty_input
             else: raise ValueError
@@ -358,9 +396,7 @@ class GameSettings():
         except ValueError:
             print(self.difficulty_chosen)
             print(difficulty_input in self.difficulty_modes)
-            print(f"{Fore.RED}[WARNING]{Style.RESET_ALL}" + " Please enter a valid number.")
-
-
+            print(f"{Fore.RED}[OINK!]{Style.RESET_ALL}" + " Please enter a valid number.")
 
     def confirm_choice(self):
         try:
@@ -374,7 +410,7 @@ class GameSettings():
             else: raise ValueError
 
         except ValueError:
-            print(f"{Fore.RED}[WARNING]{Style.RESET_ALL}" + " Please enter a valid option")
+            print(f"{Fore.RED}[OINK!]{Style.RESET_ALL}" + " Please enter a valid option")
             print_line(1)
 
     def edit_difficulty(self):
@@ -382,13 +418,9 @@ class GameSettings():
         while not self.difficulty_confirmed: self.confirm_choice()
         self.maxRange = self.difficulty_modes[self.difficulty_chosen]["maxInt"]
         self.maxAttempts = self.difficulty_modes[self.difficulty_chosen]["maxAttempts"]
-        self.remaining = self.difficulty_modes[self.difficulty_chosen]["maxAttempts"] - self.attempt + 1
+        self.remaining = self.difficulty_modes[self.difficulty_chosen]["maxAttempts"] - self.attempt
 
 
-
-
-
-########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
 
@@ -418,23 +450,22 @@ class Game(GameSettings):
 
     def play_game(self):
         print_space(1); print_line(1); print_space(1)
-        print("Welcome!")
-        print("You need to enter a number from 1 to {max}".format(max=self.maxRange))
+        print(f"{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}OINK OINK! LET THE GAMES BEGIN!{Style.RESET_ALL}")
+        print(f"{Fore.LIGHTMAGENTA_EX}You need to enter a number from 1 to {self.maxRange}{Style.RESET_ALL}")
         while self.answer != self.guess:
-            if self.attempt > self.maxAttempts:
+            if self.attempt >= self.maxAttempts:
                 print_line(1); print_space(1)
-                print(f"{Fore.RED}You lose! The answer was {self.answer}{Style.RESET_ALL}")
+                print(f"{Fore.RED}:sad-pig-emoji: Oiink.... You lose! The answer was {self.answer}{Style.RESET_ALL}")
                 print_space(1); print_line(2);
-                print_intro()
                 main_menu()
                 # create a function lose + potential rematch
 
             try:
+                print_space(1)
                 if self.hint_chosen and self.attempt:
-                    if self.guess < self.answer: print("[Hint] It's higher than [{answer}]".format(answer=self.guess))
-                    elif self.guess > self.answer: print("[Hint] It's lower than [{answer}]".format(answer=self.guess))
-                self.guess = int(input(f"{Fore.YELLOW}[INPUT NEEDED]{Style.RESET_ALL}" + " {attempts} guesses left // Enter a number: ".format( attempts=self.remaining)))
-                print_line(1)
+                    if self.guess < self.answer: print("*PIG WHISPER* SHhHhh.. It's higher than [{answer}]".format(answer=self.guess))
+                    elif self.guess > self.answer: print("*PIG WHISPER* SHhHhh.. It's lower than [{answer}]".format(answer=self.guess))
+                self.guess = int(input(f"{Fore.YELLOW}[PIG ORDER]{Style.RESET_ALL}" + " {attempts} guesses left // Enter a number: ".format( attempts=self.remaining)))
 
                 if 0 < self.guess <= self.maxRange:
                     self.attempt += 1
@@ -443,24 +474,30 @@ class Game(GameSettings):
                 else: raise ValueError
 
             except (TypeError, ValueError):
-                print(f"{Fore.RED}[WARNING] You need to enter a number from 1 to {self.maxRange}{Style.RESET_ALL}")
+                print(f"{Fore.RED}[PIG ANGRY!] I said a number from 1 to {self.maxRange}!{Style.RESET_ALL}")
         else:
             self.print_results()
             self.save_score()
             read_scores()
             print_line(1)
-            print_intro()
+            print_intro1()
             main_menu()
             # print("Want to play again?\n")
             # if int(input("Type 1:")) != 1: replay = False
 
     def print_results(self):
-        print_space(1)
-        print(f"{Fore.GREEN}Good JOB! The answer was [{self.answer}] and it took you [{self.attempt}] attempt(s) to find it!{Style.RESET_ALL}")
+        print_space(1); print_line(1); print_space(1)
+        print(f"{Fore.GREEN}Oooink Oiiiink (aka. \"Good job!\"). The answer was [{self.answer}] and it took you [{self.attempt}] attempt(s) to find it!{Style.RESET_ALL}")
         print_space(1); print_line(1);
 
 
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
 """ Game launch """
-test_color()
-print_intro()
+
+
+print_intro1()
+print_intro2()
 main_menu()
