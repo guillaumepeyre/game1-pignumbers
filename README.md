@@ -1,7 +1,7 @@
 # Learning Python: Pig Games
 ## Game #1: Number Guesser (oink!)
 
-I'm learning Python and this is my first mini-game.
+I'm learning Python and this is my first mini-game. Feel free to reach out for anything :)
 
 <a href="github.com/guillaumepeyre" target="_blank">github.com/guillaumepeyre</a><br>
 guillaumepeyre@proton.me
