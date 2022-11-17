@@ -35,8 +35,6 @@ Welcome to Learning Python: Pig Games!{Style.RESET_ALL}
 """)
 
 
-
-
 def print_intro2():
     print(f"""{Fore.LIGHTMAGENTA_EX}Oink... I'm thinking about a number. Can you guess it???
 There are different options to make our game more interesting:
@@ -125,7 +123,6 @@ What would you like to do?
 \t [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}2{Style.RESET_ALL}] Reset scores (this CANNOT be undone!)
 \t [{Fore.LIGHTMAGENTA_EX + Style.BRIGHT}3{Style.RESET_ALL}] Go back to main menu
 """)
-
 
     try:
         option = int(input(f"{Fore.YELLOW}[PIG ORDER]{Style.RESET_ALL}" + " Enter an option now!: "))
@@ -290,7 +287,6 @@ class GameSettings():
             self.maxAttempts = self.difficulty_modes[self.difficulty_chosen]['maxAttempts']
             self.remaining = self.maxAttempts
 
-        # @property
     def preferences_file_check(self):
         if file_exists('preferences.csv'):
             # if row 'difficulty' or 'hint' doesn't exist, reset preferences file to default
@@ -356,8 +352,7 @@ class GameSettings():
         else: raise FileNotFoundError
 
     def toggle_hint(self):
-        print("""
-[Hint Mode] It makes the game easier by letting you know if the answer is higher or lower than your input.""")
+        print("""[Hint Mode] It makes the game easier by letting you know if the answer is higher or lower than your input.""")
         # Comes after preferences_file_check() which ensured preferences.csv hasn't been tempered with
         self.hint_chosen = self.retrieve_preferences('hint')
 
@@ -496,7 +491,6 @@ class Game(GameSettings):
 ########################################################################################################################
 
 """ Game launch """
-
 
 print_intro1()
 print_intro2()
