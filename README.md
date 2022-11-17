@@ -18,9 +18,9 @@ There are different options to make it more interesting:<br>
 * Oink oink stuff
 
 ### Install dependencies
-Those are used to make the game work or style the terminal output:<br>
+They are listed in `requirements.txt` and used to make the game work or style the terminal output:<br>
 <br>
 ```pip install -r requirements.txt```
-
+```conda install --file requirements.txt```
 
 
