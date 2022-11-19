@@ -20,7 +20,7 @@ There are different options to make it more interesting:<br>
 ### Install dependencies
 They are listed in `requirements.txt` and used to make the game work or style the terminal output:<br>
 <br>
-For pip:
+For pip:<br>
 ```pip install -r requirements.txt```<br>
 
 
